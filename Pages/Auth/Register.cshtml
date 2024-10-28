@@ -1,0 +1,143 @@
+﻿@page
+@model Model.Input.CreateCustomer
+@{
+    ViewData["Title"] = "Register";
+}
+    <div class="form-container">
+    <form id="registerForm" method="post" action="@Url.Action("Register", "Auth")">
+            <h2>Registrasi ke RentCar</h2>
+
+            <label>Username</label>
+        <input asp-for="Username" type="text" id="username" placeholder="Masukan username Anda">
+        <span class="error" id="usernameError" style="color:red;"></span>
+
+            <label>Email</label>
+        <input asp-for="Email" type="text" id="email" placeholder="Masukan email Anda">
+        <span class="error" id="emailError" style="color:red;"></span>
+
+            <label for="password">Password</label>
+        <input asp-for="Password" type="password" id="password" placeholder="Masukan password Anda">
+
+        <label for="re-password">Re-Password</label>
+        <input asp-for="RePassword" type="re-password" id="re-password" placeholder="Masukan kembali password Anda">
+        <span class="error" id="passwordError" style="color:red;"></span>
+
+
+            <label for="alamat">Alamat</label>
+        <input asp-for="Alamat" type="text" id="alamat" placeholder="Masukan alamat Anda">
+        <span class="error" id="alamatError" style="color:red;"></span>
+
+            <button type="submit">Registrasi</button>
+            <p>Sudah punya akun? Login <a href="@Url.Action("Login", "Auth")">disini</a></p>
+
+            @if (ViewBag.ErrorMessage != null)
+            {
+                <p style="color:red;">@ViewBag.ErrorMessage</p>
+            }
+        </form>
+    </div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $("#registerForm").submit(function (event) {
+                event.preventDefault();
+
+                $(".error").text("");
+
+                var formData = $(this).serialize();
+
+                $.ajax({
+                    type: "POST",
+                    url: $(this).attr("action"),
+                    data: formData,
+                    success: function (response) {
+                        if (response.success) {
+                            window.location.href = response.redirectUrl;
+                        }
+                        else {
+                            if (response.errors) {
+                                $.each(response.errors, function(key, value) {
+                                      $("#" + key + "Error").text(value);
+                                })
+                            }
+                        }
+                    },
+                    error: function () {
+                        alert("Terjadi kesalahan saat mengirim data. Silakan coba lagi.");
+                    }
+                })
+            })
+        })
+    </script>
+}
+
+    <style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        background-color: #f8f0fa;
+    }
+
+    h2 {
+        text-align: center;
+    }
+
+    .form-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+    }
+
+    form {
+        display: flex;
+        flex-direction: column;
+        padding: 40px;
+        background-color: #ccbbfc;
+    }
+
+        form label {
+            font-size: 14px;
+            font-weight: bold;
+            margin-top: 15px;
+            margin-bottom: 5px;
+        }
+
+        form input {
+            width: 300px;
+            height: 30px;
+            font-size: 14px;
+            padding-left: 5px;
+            border-radius: 5px;
+            border: none;
+        }
+
+    button {
+        background-color: #fac0d8;
+        width: 300px;
+        height: 30px;
+        color: #fff;
+        border-radius: 5px;
+        border: none;
+        margin: 25px 0;
+    }
+
+    p {
+        text-align: center;
+        font-size: 14px;
+        color: #520244;
+    }
+
+    a {
+        text-decoration: none;
+        color: #520244;
+    }
+
+        a:hover {
+            color: #fff;
+        }
+
+    </style>

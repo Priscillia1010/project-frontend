@@ -1,0 +1,96 @@
+﻿
+@page
+@model CarRent_Frontend.Pages.Auth.RegisterModel
+@{
+    ViewData["Title"] = "Login";
+}
+
+    <div class="form-container">
+        <form id="loginForm" method="post" action="Login">
+            <h2>Login ke RentCar</h2>
+
+            <label>Username</label>
+            <input type="text" id="username" placeholder="Masukan username Anda">
+
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="Masukan password Anda">
+
+            <button type="submit">Login</button>
+            <p>Belum punya akun? Registrasi <a href="@Url.Action("Register", "Auth")">disini</a></p>
+
+            @if (ViewBag.ErrorMessage != null)
+            {
+                <p style="color:red;">@ViewBag.ErrorMessage</p>
+            }
+        </form>
+    </div>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        background-color: #f8f0fa;
+    }
+
+    h2 {
+        text-align: center;
+    }
+
+    .form-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+    }
+
+    form {
+        display: flex;
+        flex-direction: column;
+        padding: 40px;
+        background-color: #ccbbfc;
+    }
+
+        form label {
+            font-size: 14px;
+            font-weight: bold;
+            margin-top: 15px;
+            margin-bottom: 5px;
+        }
+
+        form input {
+            width: 300px;
+            height: 30px;
+            font-size: 14px;
+            padding-left: 5px;
+            border-radius: 5px;
+            border: none;
+        }
+
+    button {
+        background-color: #fac0d8;
+        width: 300px;
+        height: 30px;
+        color: #fff;
+        border-radius: 5px;
+        border: none;
+        margin: 25px 0;
+    }
+
+    p {
+        text-align: center;
+        font-size: 14px;
+        color: #520244;
+    }
+
+    a {
+        text-decoration: none;
+        color: #520244;
+    }
+
+        a:hover {
+            color: #fff;
+        }
+
+</style>

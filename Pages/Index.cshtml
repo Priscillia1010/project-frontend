@@ -1,0 +1,311 @@
+﻿@page
+@model CarRent_Frontend.Pages.IndexModel
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<header>
+    <nav class="navbar">
+        <div class="left-nav">
+            <button id="toggleMenu" onclick="toggleMenu()">☰</button>
+            <h2 class="logo">RentCar</h2>
+        </div>
+        <div class="right-nav">
+            <a href="@Url.Action("Login", "Auth")" class="login-btn">Login</a>
+            <a href="@Url.Action("Register", "Auth")" class="register-btn">Register</a>
+        </div>
+    </nav>
+</header>
+
+<aside id="sideMenu" class="side-menu hidden">
+    <button id="closeMenu" onclick="hideMenu()">x</button>
+    <ul>
+        <li>
+            <a href="@Url.Action("Index", "Home")" onclick="hideMenu()">Home</a>
+        </li>
+        <li>
+            <a href="#">Riwayat Penyewaan</a>
+        </li>
+        <li>
+            <a href="#">Kontak Kami</a>
+        </li>
+    </ul>
+</aside>
+
+<div class="main-content">
+    <h3>Selamat Datang di Rental Mobil Kami</h3>
+    <section class="search-section">
+        <form id="searchForm">
+            <div class="input-tgl">
+                <label for="rentalDate">Pickup Date:</label>
+                <input type="date" id="rentalDate" name="rentalDate" required>
+            </div>
+
+            <div class="input-tgl">
+                <label for="returnDate">Return Date:</label>
+                <input type="date" id="returnDate" name="returnDate" required>
+            </div>
+
+            <div class="input-tgl">
+                <label for="year">Filter Tahun Pembuatan</label>
+                <select name="year" id="year">
+                    <option value="">Semua Tahun</option>
+                    <script>
+                        for (let year = 1990; year <= 2024; year++) {
+                            document.write(`<option value="${year}">${year}</option>`);
+                        }
+                    </script>
+                </select>
+            </div>
+
+            <button type="submit">Cari</button>
+        </form>
+    </section>
+
+    <div id="result" class="result-section">
+    </div>
+</div>
+
+<footer>
+    <p>&copy; 2024 RentCar App. Semua Hak Dilindungi</p>
+</footer>
+
+@await Html.PartialAsync("Car/CarInfo")
+
+@section Scripts {
+    <script>
+        $(document).ready(async function() {
+            var app = {};
+
+            app.getReq = function(url, params) {
+                return new Promise(function(resolve, reject) {
+                    $.ajax({
+                        type: "GET",
+                        url: url,
+                        data: params,
+                        success: function (response) {
+                            resolve(response);
+                        },
+                        error: function (error) {
+                            reject(error);
+                        },
+                        contentType: "application/json"
+                    })
+                })
+            }
+
+            $('#searchForm').on('submit', async function(e) {
+                e.preventDefault();
+                const rental_date = $('#rentalDate').val();
+                const return_date = $('#returnDate').val();
+                const car_year = $("#year").val();
+                const params = { rental_date, return_date, car_year };
+
+                try {
+                    let response = await app.getReq("/Car/SearchCars", params);
+                    let cars = response.data;
+
+                    let resultHtml = '';
+                    if (cars.length > 0) {
+                        cars.forEach(car => {
+                            resultHtml += `
+                            <div class="car-item">
+                                <img src="car.image_link">
+                                <h4>${car.car_name}</h4>
+                                <p>Price: $${car.price_per_day}/day</p>
+                                <button>Sewa Sekarang</button>
+                            </div>
+                        `;
+                        });
+                    }
+                    else {
+                        resultHtml = '<p>Tidak ada mobil yang tersedia.</p>';
+                    }
+                    $('#result').html(resultHtml);
+                }
+                catch (error) {
+                    alert('Error fetching cars: ' + error);
+                }
+            })
+            
+            await.initPage();
+        })
+    </script>
+}
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        background-color: #f8f0fa;
+    }
+
+    .navbar {
+        width: 90%;
+        height: 70px;
+        margin: 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: #ccbbfc;
+        padding: 10px;
+        position: fixed;
+        top: 0;
+        z-index: 1000;
+    }
+
+    .left-nav {
+        display: flex;
+        flex-direction: row;
+        color: #520244;
+    }
+
+        .left-nav button {
+            background-color: transparent;
+            border: none;
+            font-size: 30px;
+            cursor: pointer;
+        }
+
+    .right-nav {
+        display: flex;
+        gap: 10px;
+        margin-right: 30px;
+    }
+
+        .right-nav a {
+            background-color: #fac0d8;
+            padding: 10px 20px;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+            .right-nav a:hover {
+                background-color: #e6c9f7;
+            }
+
+    .side-menu {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 200px;
+        height: 100%;
+        background-color: #7e5b8f;
+        padding: 20px;
+        color: #fff;
+        padding-top: 50px;
+        z-index: 2000;
+    }
+
+        .side-menu.visible {
+            display: block;
+        }
+
+    #closeMenu {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        background-color: transparent;
+        color: #fff;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+    }
+
+    .side-menu ul {
+        list-style: none;
+        padding: 0;
+    }
+
+        .side-menu ul li {
+            margin: 20px 0;
+        }
+
+            .side-menu ul li a {
+                color: #fff;
+                text-decoration: none;
+                font-size: 20px;
+            }
+
+                .side-menu ul li a:hover {
+                    text-decoration: underline;
+                }
+
+    .hidden {
+        display: none;
+    }
+
+    .main-content {
+        margin-top: 150px;
+    }
+
+    h3 {
+        color: #520244;
+        text-align: center;
+        margin-top: 100px;
+    }
+
+    .search-section {
+        padding: 20px 40px;
+        background-color: #a5e4fa;
+        margin-bottom: 50px;
+    }
+
+    form {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .input-tgl {
+        display: flex;
+        flex-direction: column;
+    }
+
+    label {
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+    input,
+    select {
+        width: 200px;
+    }
+
+    input {
+        height: 30px;
+    }
+
+    select {
+        height: 35px;
+    }
+
+    form button {
+        background-color: #fac0d8;
+        width: 65px;
+        height: 35px;
+        border: none;
+        border-radius: 5px;
+        color: #fff;
+        cursor: pointer;
+    }
+
+        form button:hover {
+            background-color: #e6c9f7;
+        }
+
+    footer {
+        width: 100%;
+        background-color: #ccbbfc;
+    }
+
+        footer p {
+            text-align: center;
+            padding: 20px;
+        }
+
+</style>
